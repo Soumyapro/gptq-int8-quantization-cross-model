@@ -61,19 +61,8 @@ GPTQ INT8 quantization produced perplexity changes small enough to be considered
 
 - GPTQ's calibration driven, error compensated approach to INT8 quantization is essentially lossless for both models tested, consistent with GPTQ's design goal of using real activation statistics (via the Hessian) rather than raw weight magnitude alone to guide quantization decisions.
 - This result held consistently across two architecturally different models (Qwen and SmolLM2), not just one, which is the core finding this project set out to check.
-- INT8 alone does not stress test a quantization method meaningfully. The interesting failure modes in quantization literature typically appear at INT4 and below, meaning this result should be read as "GPTQ INT8 is safe," not "GPTQ is lossless at any bit width."
 - Calibration and evaluation data must be drawn from separate splits and never mixed, otherwise perplexity numbers become an unreliable, overly optimistic measure of quantization quality.
-
----
-
-## What This Project Deliberately Does Not Do
-
-- **Only INT8 was tested.** INT4 and INT3 were part of the original scope but were dropped to keep the project achievable within available time and Colab GPU memory, after repeated out of memory crashes when running higher bit width and higher model count combinations in a single session. Lower bit widths are very likely to reveal degradation that INT8 does not, and are a natural next step.
-- **No per layer reconstruction error was measured.** Aggregate perplexity can mask layer level or module level (attention vs MLP) differences in how much quantization error each part of the model absorbs. This is left for a future project, using forward hooks to compare per layer outputs between FP16 and quantized models.
-- **The GPTQ algorithm was not implemented from scratch.** This project uses GPTQModel's implementation rather than a from scratch Hessian and column wise quantization loop, unlike the per channel vs per tensor project that preceded this one.
-- **No memory or inference speed benchmarks were run.** Only quality (perplexity) was measured. Real INT8 deployment benefits (memory footprint, throughput) were not benchmarked here.
-- **Only two models and one calibration configuration were tested.** Findings are reported as holding across these two models specifically, not claimed to generalize broadly to all architectures or calibration setups.
-
+  
 ---
 
 ## Repository Structure
